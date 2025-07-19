@@ -1,8 +1,11 @@
 #define ClockPin -1
 #define DataPin -1
-#define MAX_TIME 300000 // 5 minuti
-#define TOTAL_TRIES 2
+#define MAX_TIME 300000 // 5 minuti in ms
+#define PENALTY_TIME 50000 //ms
+#define STRIKES 3
 #define TOTAL_MODULES 9
+long StartTime;
+long PenaltyTime;
 
 struct BoardState
 {
@@ -16,8 +19,7 @@ struct BoardState
 
 unsigned int timeleft ( ) // the number is clamped to [0,maxtime) if 0 it is over
 {
-
-	long TimePassed = mills();
+	long TimePassed = mills() - StartTime + PenaltyTime;
 	long TimeLeft = MAX_TIME - TimePassed;
 	if(TimeLeft > 0){
 		return TimeLeft;
@@ -25,4 +27,3 @@ unsigned int timeleft ( ) // the number is clamped to [0,maxtime) if 0 it is ove
 		return 0;
 	}
 }
-

@@ -1,5 +1,12 @@
 #include "common.h"
 
+int Modules_Solved = 0;
+int Strikes = 0;
+int EoG = 0;
+
+long StartTime = 0;
+long PenaltyTime = 0;
+
 BoardState get ( )
 {
 	// check the pins for the diffent states and set them
@@ -13,12 +20,54 @@ void display_time ( int time )
 
 void detonate ( )
 {
-
+ //activate bomb
+ //close
 }
 
 void solved ( )
 {
+ //do something with the timer
+ //close
+}
 
+void correct ( )
+{
+	Modules_Solved ++;
+}
+
+void error ( )
+{
+	Strikes ++;
+	PenaltyTime += PENALTY_TIME;
+	
+}
+
+void end_of_game ( )
+{
+	if(EoG == 1){
+		solved();
+	}else if(EoG == -1){
+		detonate();
+	}else{
+		//fuck
+	}
+
+}
+
+void check_wires ( )
+{
+	if(ClockPin == HIGH && DataPin == LOW){
+		error();
+	}
+
+	if(ClockPin == LOW && DataPin == HIGH){
+		correct();
+	}
+
+	if(ClockPin == HIGH && DataPin == HIGH){
+
+		end_of_game();
+	}
 }
 
 void setup ( )
@@ -28,13 +77,15 @@ void setup ( )
 	// the Board State
 	
 	// set up for the timing function and display
-	display_time ( timeleft ( ) ); 
+	display_time ( MAX_TIME ); 
+
+	//wait for signal to start
+	StartTime = mill();
 }
 
 void loop ( ) 
 {
-	static int Tries = TOTAL_TRIES;
-	static int Modules_Solved = TOTAL_MODULES - 1;
+	
 	// listen for:
 	// ClockPin | DataPin | Outcome
 	// ---------|---------|--------
@@ -45,21 +96,28 @@ void loop ( )
 	// the End the Game state is set by this process
 	// update Tries accordingly
 	// decrement Modules Solved accordingly
-	
-	if ( !timeleft ( ) || Tries <= 0 )
+
+
+	check_wires();
+
+	if ( timeleft() == 0 || Strikes >= MAX_STRIKES )
 	{
 		// send the End the Game state
-		detonate ( );
+		EoG = -1;
+		ClockPin = HIGH;
+		DataPin = HIGH;
 		// exit the program 
 	}
 
-	if ( !Modules_Solved )
+	if ( Modules_Solved >= TOTAL_MODULES )
 	{
 		// send the End the Game state
-		solved ( );
+		EoG = 1;
+		ClockPin = HIGH;
+		DataPin = HIGH;
 		// exit the program
 	}
 
 	// displays time left
-	display_time ( timeleft ( ) ); 
+	display_time ( timeleft (StartTime, PenaltyTime) ); 
 }
