@@ -1,6 +1,6 @@
 #define ClockPin -1
 #define DataPin -1
-#define MAX_TIME 300 // 5 minuti
+#define MAX_TIME 300000 // 5 minuti
 #define TOTAL_TRIES 2
 #define TOTAL_MODULES 9
 
@@ -16,9 +16,13 @@ struct BoardState
 
 unsigned int timeleft ( ) // the number is clamped to [0,maxtime) if 0 it is over
 {
-	// check if time > end_time
-	static int end_time = time ( 0 ) + MAX_TIME; // use the one for arudino
-	auto this_time = end_time - time ( 0 )
-	return ( this_time <= 0 ? 0 : this_time );
+
+	long TimePassed = mills();
+	long TimeLeft = MAX_TIME - TimePassed;
+	if(TimeLeft > 0){
+		return TimeLeft;
+	}else{
+		return 0;
+	}
 }
 
