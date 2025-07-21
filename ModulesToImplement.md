@@ -7,16 +7,15 @@
 
 ## Normal Modules
 
-- [ ] Wires
-- [ ] Button
-- [ ] KeyPads
-- [ ] Simon
-- [ ] WhosOn
-- [ ] Memory
-- [ ] MorseCode
-- [ ] ComplicatedWires
-- [ ] Mazes
-- [ ] Password
+1 - [ ] Wires
+2 - [ ] Button
+3 - [ ] KeyPads
+4 - [ ] Simon
+6 - [ ] Memory
+7 - [ ] MorseCode
+9 - [ ] ComplicatedWires
+10- [ ] Mazes
+11- [ ] Password
 
 ## Neady Modules
 

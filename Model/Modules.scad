@@ -24,11 +24,22 @@ module KeyPads ( ) {
 }
 
 module Simon ( ) {
+    ofset = 2;
     difference ( ) {
         BModule ( );
         
+        for ( i = [0:3] )
+        {
+            rotate ( 45 + 90 * i )
+            translate ( [ofset,ofset])
+            cube ( module_l / 2 / sqrt ( 2 ) * 0.9 );
+        }
+        rotate ( 45 )
+        translate ( [0,0,-module_l / 2  / sqrt ( 2 ) + module_d/2] )
+        cube ( module_l  / sqrt ( 2 ) , center = true );
     }
 }
+Simon ( );
 
 module WhosOn ( ) {
     difference ( ) {

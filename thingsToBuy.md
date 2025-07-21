@@ -24,3 +24,50 @@ shit ton
 ## da pensare per il seriale
 
 ## specifici per i moduli
+
+### Wires
+
+- ( cavi )
+
+### Buttons
+
+- Button
+- 3 ledrgb
+
+### KeyPads
+
+- 4 Buttons
+- 4 Led ( qualunque singolo )
+
+### Simon
+
+- 4 Buttons
+- 4 Leds ( Red, Yellow, Blue, Green )
+
+### Memory
+
+- 5 Led singolo colore
+- 7 segment singolo 
+
+### Morse 
+
+- Potenziometro
+- Fanchy Led
+- 7 segment (n.nnn mhz)
+
+### Complicated Wires
+
+- flat dial switch ( 6 switches )
+
+### Mazes
+
+- Display 6x6
+
+### Passwords
+
+- 7 segment ( 4 - 6 segments )
+
+### Capacitor
+
+- 8 led
+- button

@@ -1,21 +1,21 @@
 // UBomb
 
-module_l = 100;
-module_d = 30;
-module_indent_w = 30;
-module_indent_d = 5;
-module_lighit_d = 25;
+module_l = 70;
+module_d = 25;
+module_indent_w = 17;
+module_indent_d = 3;
+module_lighit_d = 18;
 module_lighit_cut = 5;
-module_internal_wall = 5;
+module_internal_wall = 3;
 
-moudle_light_d_1 = 25;
-moudle_light_d_2 = 10;
+moudle_light_d_1 = 17;
+moudle_light_d_2 = 8;
 moudle_light_reduction = 0.7;
 moudle_light_diamater = 7;
 
 module_screw_cap_d = 5;
 
-rounding = 2;
+rounding = 1.5;
 
 light_center = module_l/2 + module_indent_d - module_lighit_d/2 + rounding/2;
 
@@ -27,7 +27,7 @@ clip_attach_h = 1.2;
 clip_attach_d = 6;
 clip_attach_w = 5;
 
-normal_clip_w = 20;
+normal_clip_w = 14;
 small_clip_w = 5;
 clip_pading = 11;
 tollerance = 0.3;
@@ -39,7 +39,6 @@ body_separator_hole = body_separator_w + rounding/2 + tollerance;
 body_separator_d = 25;
 body_shell_thick = 7;
 body_shell_d = 30;
-
 
 
 clip_on_module_h = 0.35;
@@ -195,7 +194,7 @@ module BModule ( ) // body of the module
             
             
             // light stand
-            translate ( [light_center,light_center,-(moudle_light_d_2-module_d)/2] )
+            translate ( [light_center,light_center,moudle_light_d_1 - module_d/2 ] )
             minkowski ( )
             {
                 union ( )
@@ -463,3 +462,5 @@ union ( ) {
     
 }*/
 
+
+BModule ( );
