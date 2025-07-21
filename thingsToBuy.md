@@ -71,3 +71,8 @@ shit ton
 
 - 8 led
 - button
+
+### Knobs
+
+- Potentiomenter
+- 12 leds
