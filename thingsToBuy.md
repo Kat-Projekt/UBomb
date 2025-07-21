@@ -62,6 +62,7 @@ shit ton
 ### Mazes
 
 - Display 6x6
+- 4 buttons
 
 ### Passwords
 
