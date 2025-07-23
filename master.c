@@ -78,6 +78,9 @@ void setup ( )
 	
 	auto State = get ( );
 	// trasmit over the ClockPin e DataPin following I2C standard
+	wire.begin();
+	
+	wire.end();
 	// the Board State
 	
 	// set up for the timing function and display

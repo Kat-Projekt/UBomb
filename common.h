@@ -1,10 +1,10 @@
-#define ClockPin -1
-#define DataPin -1
-#define MAX_TIME 300000 // 5 minuti in ms
-#define PENALTY_TIME 50000 //ms
-#define MAX_STRIKES 3
-#define TOTAL_MODULES 9
-long StartTime long, PenaltyTime
+#include<wire.h>
+#define ClockPin -1;
+#define DataPin -1;
+#define MAX_TIME 300000; // 5 minuti in ms
+#define PENALTY_TIME 50000; //ms
+#define MAX_STRIKES 3;
+#define TOTAL_MODULES 9;
 
 struct BoardState
 {

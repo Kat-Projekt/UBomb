@@ -1,0 +1,29 @@
+switch (sooution) {
+		case 0:
+			// statements
+			break;
+		case 1:
+			// statements
+			break;
+		case 2:
+			// statements
+			break;
+		case 3:
+			// statements
+			break;
+		case 4:
+			// statements
+			break;
+		case 5:
+			// statements
+			break;
+		case 6:
+			// statements
+			break;
+		case 7:
+			// statements
+			break;
+		default:
+			// statements
+			break;
+    }
