@@ -1,15 +1,15 @@
 // UBomb
 
 module_l = 70;
-module_d = 25;
+module_d = 50;
 module_indent_w = 17;
 module_indent_d = 3;
 module_lighit_d = 18;
 module_lighit_cut = 5;
 module_internal_wall = 3;
 
-moudle_light_d_1 = 17;
-moudle_light_d_2 = 8;
+moudle_light_d_1 = 40;
+moudle_light_d_2 = 10;
 moudle_light_reduction = 0.7;
 moudle_light_diamater = 7;
 
@@ -19,7 +19,7 @@ rounding = 1.5;
 
 light_center = module_l/2 + module_indent_d - module_lighit_d/2 + rounding/2;
 
-clip_diametro = 5.5;
+clip_diametro = 3.7;
 clip_spessore = 0.7;
 clip_lunghezz = 17;
 
@@ -34,14 +34,14 @@ tollerance = 0.3;
 
 body_n = 3; // numer of modules on x
 body_m = 2; // mods on y
-body_separator_w = 5;
+body_separator_w = 5 - 2/3;
 body_separator_hole = body_separator_w + rounding/2 + tollerance;
-body_separator_d = 25;
+body_separator_d = 45;
 body_shell_thick = 7;
 body_shell_d = 30;
 
 
-clip_on_module_h = 0.35;
+clip_on_module_h = 10.5 + 0.125;
 
 // with tollence
 larghezza_modulo = module_l + module_indent_d*2 + rounding*3/2 + tollerance*2;
@@ -50,7 +50,16 @@ module Screw ( )
 {
     cylinder (d=2,h=10,$fn = 16 );
     mirror ( [ 0,0,1] )
-    cylinder (d=3,h=10,$fn = 16 );
+    cylinder (d=6,h=10,$fn = 16 );
+}
+
+module Led ( ) {
+    inner_diameter = 5.17;
+    outer_diameter = 8;
+    cylinder ( d = inner_diameter, h = 100, $fn = 32 );
+    translate ( [ 0,0,module_d/2 ] )
+    mirror ( [0,0,1] )
+    cylinder ( d = outer_diameter, h = 100, $fn = 32 );
 }
 
 module IcoSphere ( d = rounding )
@@ -172,7 +181,7 @@ module ModuleShape ( )
 
 module SModule ( ) // screws positioning
 {
-    translate ( [0,0,-module_d/2])
+    translate ( [0,0,-module_d/2 + 1.7] )
     for ( i = [0:3])
     rotate ( 90*i )
     translate ( [0,module_l/2+(module_indent_d+rounding/2)/2])
@@ -218,13 +227,13 @@ module BModule ( ) // body of the module
         projection(cut = true) ModuleShape ( );
         
         // light
-        translate ( [light_center,light_center,-moudle_light_diamater/2] )
-        cylinder ( d=moudle_light_diamater,h = moudle_light_d_1+moudle_light_d_2, $fn = 8 );
+        translate ( [light_center,light_center,] )
+        Led ( );
         
-        translate ( [light_center,light_center] )
-        rotate ( 180+45,[0,0,1])
-        rotate ( 90,[0,1,0])
-        cylinder ( d=moudle_light_diamater,h = moudle_light_d_1+moudle_light_d_2, $fn = 4 );
+        translate ( [light_center,light_center,-1000 + module_d/4] )
+        rotate ( 90+45,[0,0,1])
+        translate ( [ -moudle_light_diamater/2,0])
+        cube ( [ moudle_light_diamater, module_l/2,1000]);
         
         // remove bottom to make it flat 
         translate ( [0,0,-module_l-module_d/2+module_screw_cap_d])
@@ -309,6 +318,23 @@ module CModule ( ) // bottom lid or cap
 
 // ------------- CONTAINER ------------
 
+module Separator_Holes ( segments, vertical_cut = 1) 
+{
+    // screw holes 
+        
+    for ( i = [1:segments-1] )
+    {
+        translate ( [0,
+            larghezza_modulo * i + body_separator_w * ( i - 1 ) + body_separator_hole/2 ,
+            ( 1 - vertical_cut ) * body_separator_d / 2 + body_separator_d / 4
+        ] )
+        rotate ( 90, [0,1,0] )
+        union ( )
+        {
+            Screw ( );
+        }
+    }
+}
 module Separator ( segments, vertical_cut = 1 )
 {
     lungezza = ( larghezza_modulo ) * segments + body_separator_hole * ( segments - 1 );
@@ -317,8 +343,8 @@ module Separator ( segments, vertical_cut = 1 )
         union ( )
         {
             minkowski ( ) {
-                translate ( [0,1/2,1/sqrt(3)]*rounding - [0,body_separator_w/2] )
-                cube ( [ body_separator_w-rounding/2, lungezza-rounding + body_separator_w, body_separator_d -rounding * 2 / sqrt(3) ] );
+                translate ( [0,1/2,1/sqrt(3)]*rounding - [0,body_separator_w/4] )
+                cube ( [ body_separator_w-rounding/2, lungezza-rounding + body_separator_w/2, body_separator_d -rounding * 2 / sqrt(3) ] );
                 IcoSphere ( );
             }
         
@@ -366,7 +392,19 @@ module Separator ( segments, vertical_cut = 1 )
         }
     }
 }
-
+/*
+difference ( )
+{
+    Separator ( 2,1 );
+    translate ( [body_separator_w/2+tollerance,-body_separator_w,-rounding] )
+    cube ( larghezza_modulo * 4 );
+    
+    translate ( [ body_separator_w/2 + tollerance - 2.7,0,0 ] )
+    mirror ( [ 1,0,0] )
+    Separator_Holes ( 2,1 );
+}
+    
+*/
 module Box ( n,m )
 {   
     difference ( )
@@ -403,38 +441,42 @@ module Box ( n,m )
 // Box ( 2,3 );
 
 // Separator ( 3 );
+
 /*
 translate ( [-1,1,0] * (module_l/2+module_indent_d+rounding/2 + tollerance) )
-translate ( [-tollerance/2,rounding/2+tollerance/2,module_d/2+rounding/sqrt(3)] )
+translate ( [-tollerance/2,rounding/2+tollerance/2
+
+,module_d/2+rounding/sqrt(3)] )
 union ( ) {
     BModule ( );
     CModule ( );
-}
+} 
 
+difference ( ) {
 translate ( [ rounding/2,0])
 union ( ) {
     // assi
-    Separator ( 3,1 );
+    Separator ( 3,0 );
     rotate ( -90 )
     mirror ( [1,0,0])
     translate ( [larghezza_modulo+rounding/2 + tollerance /2,-larghezza_modulo-rounding/2 - tollerance /2,0] )
-    Separator ( 2,0 );
+    Separator ( 2,1 );
     rotate ( -90 )
     mirror ( [1,0,0])
     translate ( [larghezza_modulo*2+body_separator_hole - tollerance /2,-larghezza_modulo-rounding/2- tollerance /2,0] )
-    Separator ( 2,0 );
+    Separator ( 2,1 );
     
     // laterali left right
     translate ( [larghezza_modulo+body_separator_w,0] )
     difference ( ) {
-        Separator ( 3,1 );
+        Separator ( 3,0 );
         translate ( [body_separator_w/2+tollerance,-body_separator_w,-rounding] )
         cube ( larghezza_modulo * 4 );
     }
     
     translate ( [-larghezza_modulo-body_separator_w,0] )
     difference ( ) {
-        Separator ( 3,1 );
+        Separator ( 3,0 );
         translate ( [-larghezza_modulo * 4 + body_separator_w/2-rounding/2-tollerance,-body_separator_w,-rounding] )
         cube ( larghezza_modulo * 4 );
     }
@@ -445,7 +487,7 @@ union ( ) {
     mirror ( [1,0,0])
     translate ( [-body_separator_w/2-rounding/2 - tollerance,-larghezza_modulo-rounding/2- tollerance /2,0] )
     difference ( ) {
-        Separator ( 2,0 );
+        Separator ( 2,1 );
         translate ( [-larghezza_modulo * 4 + body_separator_w/2-rounding/2-tollerance,-body_separator_w,-rounding] )
         cube ( larghezza_modulo * 4 );
     }
@@ -454,13 +496,22 @@ union ( ) {
     mirror ( [1,0,0])
     translate ( [larghezza_modulo*3+body_separator_hole*2-rounding/2-tollerance*3/2,-larghezza_modulo-rounding/2- tollerance /2,0] )
     difference ( ) {
-        Separator ( 2,0 );
+        Separator ( 2,1 );
         translate ( [body_separator_w/2+tollerance,-body_separator_w,-rounding] )
         cube ( larghezza_modulo * 4 );
     }
-    
-    
-}*/
+}
 
 
-BModule ( );
+}
+
+
+// CModule ( );
+// BModule ( );
+
+// */
+/*
+
+    mirror ( [1,0,0])
+    translate ( [larghezza_modulo+rounding/2 + tollerance /2,-larghezza_modulo-rounding/2 - tollerance /2,0] )
+    Separator ( 3,1 );*/
