@@ -11,215 +11,96 @@ module Wire ( )
     cube ( [ wire_base_thick, wire_base_thick, 100 ], center = true );
 }
 
-module Wires_Plaques ( )
-{
-    distance_thick = 1;
-    padding = 10;
-    distnace_1 = 7;
-    distnace_2 = (module_l - padding * 2 ) / 5;
-    
-    difference ( )
-    {
-        union ( )
-        {
-            translate ( [-padding/2,-padding/2] )
-            cube ( [ padding, 5*distnace_1 + padding, 2]);
-            
-            // mounting holes
-            for ( i = [0.5,4.5] )
-            {
-                scale ( [1,1,0.07])
-                translate ( [0,i*distnace_1,50*0.7] )
-                scale ( 0.7 )
-                Wire ( );
-            }
-        }
-        for ( i = [0:5] )
-        {
-            translate ( [0,i*distnace_1] )
-            Wire ( );
-        }
-    }
-    
-    translate ( [padding*2,0,0])
-    difference ( )
-    {
-        union ( )
-        {
-            translate ( [-padding/2,-padding/2] )
-            cube ( [ padding, 5*distnace_2 + padding, 2]);
-            
-            // mounting holes
-            for ( i = [0.5,4.5] )
-            {
-                scale ( [1,1,0.07])
-                translate ( [0,i*distnace_2,50*0.7] )
-                scale ( 0.7 )
-                Wire ( );
-            }
-        }
-        for ( i = [0:5] )
-        {
-            translate ( [0,i*distnace_2] )
-            Wire ( );
-        }
-    }
-}
-
 module Wires ( ) {
     distance_thick = 1;
     padding = 10;
-    distnace_1 = 7;
     distnace_2 = (module_l - padding * 2 ) / 5;
+    
+    connector_cable_d = 2;
+    
+    morsetto_h = 8;
+    morsetto_w = 46.7;
+    morsetto_d = 2.5;
+    
+    connector_w = 8;
+    connector_d = 5;
+    connector_dist = 8;
+    
+    M_total = 16;
+    
+    interferenza_cavo = 0.2;
+    cavo_thick = 1.6;
+    
     difference ( ) {
         BModule ( );
         
-        // holes for cables
-        translate ( [module_l/2 - padding,-module_l/2 + padding,module_d/2 - distance_thick] )
-        for ( i = [0:5] )
-        {
-            translate ( [0,i*distnace_1] )
-            Wire ( );
-        }
-        translate ( [-module_l/2 + padding,-module_l/2 + padding,module_d/2 - distance_thick] )
-        for ( i = [0:5] )
-        {
-            translate ( [0,i*distnace_2] )
-            Wire ( );
-        }
+        // positive
+        translate ( [module_l/2-morsetto_h/2-module_internal_wall,
+                     -module_l/2+morsetto_w/2+module_internal_wall,
+                     module_d/2 - M_total/2 - module_internal_wall + morsetto_d] )
+        cube ( [morsetto_h,morsetto_w,M_total], center = true );
         
-        // holes for mounting
-        translate ( [module_l/2 - padding,-module_l/2 + padding,module_d/2 - distance_thick] )
-        for ( i = [0.5,4.5] )
+        translate ( [module_l/2-morsetto_h/2-module_internal_wall,
+                     -module_l/2+morsetto_w/2+module_internal_wall
+                     ] )
+        // holes morsetto
+        for ( i = [-2.5:2.5] )
         {
-            translate ( [0,i*distnace_1] )
-            scale ( 0.7 )
-            Wire ( );
-        }
-        translate ( [-module_l/2 + padding,-module_l/2 + padding,module_d/2 - distance_thick] )
-        for ( i = [0.5,4.5] )
-        {
-            translate ( [0,i*distnace_2] )
-            scale ( 0.7 )
-            Wire ( );
-        }
-    }
-}
-
-// Wires_Plaques ( );
-Wires ( );
-
-module Button_Top ( )
-{
-    
-}
-
-module Button ( ) {
-    difference ( ) {
-        BModule ( );
-        translate ( [module_l/2 - 6.5,-module_l/2 + 22.5 ] )
-        cube ( [ 7,39, 1000 ],center = true );
-    }
-}
-
-module KeyPads ( ) {
-    difference ( ) {
-        BModule ( );
-        
-    }
-}
-
-module Simon_Button ( ) 
-{
-    size = 20;
-    radius = size / 2 * sqrt ( 5 );
-    brim = 2;
-    
-    button_attach_w = 1;
-    button_attach_d = 4;
-    
-    
-    
-    difference ( )
-    {
-        union ( ) {
-        
-            intersection ( )
+            minkowski ( )
             {
-                translate ( [ 0,0, size /2])
-                cube ( size, center = true );
-                intersection_for ( i = [0:3] )
-                {
-                    rotate ( 90 * i )
-                    translate ( [size/2,0])
-                    sphere ( r = radius, $fn = 50);
-                }
+                translate ( [0,connector_dist * i] )
+                cube ( [connector_w-4,connector_d-4, Max], center = true );
+                sphere ( 2 , $fn = 16);
             }
-            
-            // brim
-            translate ( [0,0,-brim / 2])
-            cube ( [size + brim, size + brim, brim ], center = true );
-        
         }
+        // vite morsetto
+        translate ( [module_indent_d+module_internal_wall+1+1,0])
+        translate ( [module_l/2-morsetto_h/2-module_internal_wall,
+                     -module_l/2+morsetto_w/2+module_internal_wall,0
+                     ] )
+        translate ( [0,connector_dist,module_d/2-module_internal_wall/2-M_total/2] )
+        rotate (-90,[0,1,0])
+        Screw ( );
         
-        translate ( [ 0,0,size*2.6])
-        rotate ( 90, [1,0,0])
-        sphere ( size * 2, $fn = 50 );
         
-        // holow - stem
-        difference ( )
+        // holes other side
+        translate ( [-module_l/2 + padding,-module_l/2 + padding,module_d/2 - distance_thick] )
+        for ( i = [0:5] )
         {
-            scale ( 0.9 )
-            difference ( ) {
-                intersection ( )
-                {
-                    translate ( [ 0,0, size /3])
-                    cube ( size, center = true );
-                    intersection_for ( i = [0:3] )
-                    {
-                        rotate ( 90 * i )
-                        translate ( [size/2,0])
-                        sphere ( r = radius, $fn = 50);
-                    }
-                }
-                
-                translate ( [ 0,0,size*2.6])
-                rotate ( 90, [1,0,0])
-                sphere ( size * 2, $fn = 50 );
-                    
-            }
-            // for easins printing
-            translate ( [ 0,0,Max/sqrt(3) + size/5 ])
-            IcoSphere ( Max );
-            
-            union ( ) {
-                
-                
-                cube ( [button_attach_w,button_attach_d,Max], center = true );
-                rotate ( 90 )
-                cube ( [button_attach_w,button_attach_d,Max], center = true );
-            }
+            translate ( [0,i*distnace_2] )
+            cylinder ( d = connector_cable_d, h = Max, center = true, $fn = 8 );
         }
+        
+        // cable passage
+        translate ( [-module_l/2 + padding,0,module_d/2 - cavo_thick /2-cavo_thick] )
+        translate ( [-connector_cable_d/2 - cavo_thick/2 + interferenza_cavo,0])
+        cube ( [cavo_thick, module_l  , cavo_thick +1], center = true );
     }
 }
 
-module Simon ( ) {
-    ofset = 2;
-    squares = 20;
-   
-    difference ( ) {
-        BModule ( );
-        
-        for ( i = [0:3] )
+
+
+module Button ( )
+{
+    translate ( [0,0, module_d/2 - module_internal_wall] )
+    minkowski ( ) { 
+        union ( )
         {
-            rotate ( 45 + 90 * i )
-            translate ( [ofset,ofset,module_d/2 - rounding])
-            cube ( squares );
+            cylinder ( d = 7, h = Max, $fn = 16 );
+            cylinder ( d = 10, h = 2, $fn = 16 );
         }
-        rotate ( 45 )
-        translate ( [0,0,-module_l / 2  / sqrt ( 2 ) + module_d/2 - rounding ] )
-        cube ( module_l  / sqrt ( 2 ) , center = true );
+        
+        IcoSphere ( 0.3 );
     }
+}
+
+module Display ( )
+{
+    Dis_w = 32;
+    Dis_l = 16;
+    
+    cube ( [Dis_w,Dis_l,Max], center = true );
+    
 }
 
 module Memory ( ) {
@@ -229,111 +110,95 @@ module Memory ( ) {
     }
 }
 
+module Selettore ( ) {
+    base = [ 17.3, 17.5,4 ];
+    pirolino = [ 4.1,21, 4 ];
+    
+    pisellino = 3;
+    pisellino_h = 2.5 + 4;
+    
+    shaft = 9;
+    
+    translate ( [0,0, module_d/2 - module_internal_wall + 1] )
+    union ( )
+    {
+        translate ( [ 0,0,-base[2] / 2 ] )
+        cube ( base, center = true );
+        
+        translate ( [ 0, ( pirolino[1]-base[1] ) /2,-base[2] / 2 ] )
+        cube ( pirolino, center = true );
+        
+        translate ( [0,base[1]/2,-base[2]])
+        cylinder ( d = pisellino, h = pisellino_h, $fn = 16 );
+        
+        cylinder ( d = shaft, h = Max, $fn = 32 );
+    }
+}
+
 module MorseCode ( ) {
+    Dis_w = 32;
+    Dis_l = 16;
+
     difference ( ) {
         BModule ( );
         
-    }
-}
-
-module ComplicatedWires ( ) {
-    difference ( ) {
-        BModule ( );
+        translate ( [-10.5,0] )
+        Display ( );
         
-    }
-}
-
-module Mazes ( ) {
-    difference ( ) {
-        BModule ( );
+        translate ( [+22,0] )
+        Selettore ( );
         
+        translate ( [+22,-20] )
+        Button ( );
+        
+        translate ( [-10,20] )
+        Led ( );
     }
 }
 
-module Password_Button ( )
-{
-    button_l = 5;
-    button_h = 7;
-    chapher = 1;
-    
-    translate ( [0,-0.5] )
-    rotate ( 90 )
-    cylinder ( d = button_l, h = button_h, $fn = 3 );
-    
-    translate ( [0,0,chapher/2] )
-    cube ( [ button_l + chapher, button_l + chapher, chapher], center = true );
-}
-
-module Password_Submit_Button ( )
-{
-    button_l = 20;
-    button_h = 7;
-    button_d = 10;
-    chapher = 1;
-    
-    translate ( [0,0,button_d/2])
-    cube ( [ button_l , button_h, button_d], center = true );
-    
-    translate ( [0,0,chapher/2] )
-    cube ( [ button_l + chapher, button_h + chapher, chapher], center = true );
-}
+MorseCode ( );
 
 module Password ( ) {
-    Dis_w = 40;
-    Dis_l = 10;
-    Dis_Pad = 4;
+    Dis_w = 30;
+    Dis_l = 14;
+    Dis_Pad = 0;
     Button_Padd = 20;
+    
+    centering = [-7,0];
     
 
     difference ( ) {
         BModule ( );
         
         // Display hole
+        translate ( centering )
         translate ( [ 0,Dis_Pad,0 ])
         cube ( [ Dis_w, Dis_l, Max ], center = true );
         
         // Submit button
         
-        translate ( [ 0,- Button_Padd, module_d/2 - module_internal_wall ])
-        minkowski ( )
-        {
-            Password_Submit_Button ( );
-            IcoSphere ( 0.3 );
-        }
+        
+        translate ( [ Dis_w/2+ 5,5])
+        Button ( );
         
         // buttons
-        
-        minkowski ( )
+        translate ( centering )
+        for ( i = [ -1.5:1.5] )
         {
-            translate ( [0,0, module_d/2 - module_internal_wall] )
-            for ( i = [ -1.5:1.5] )
-            {
-                translate ( [Dis_w/4 * i, Dis_Pad + Dis_l])
-                Password_Button ( );
-                
-                
-                translate ( [Dis_w/4 * i, Dis_Pad - Dis_l ])
-                mirror ( [0,1,0])
-                Password_Button ( );
-            }
+            translate ( [ ( Dis_w/4 + 3.5) * i, Dis_Pad + Dis_l + 3 ])
+            Button ( );
             
-            IcoSphere ( 0.3 );
+            
+            translate ( [ ( Dis_w/4 + 3.5) * i, Dis_Pad - Dis_l - 3 ])
+            mirror ( [0,1,0])
+            Button ( );
         }
     }
     
     // suspenders for board
 }
 
-// Password ( );
-
 // Neady Modules
-
-module Capacitor ( ) {
-    difference ( ) {
-        BModule ( );
-        
-    }
-}
 
 module Potentiometer ( ) {
     diameter = 15.8;
@@ -488,6 +353,8 @@ module Knobs ( ) {
     }
     
 }
+
+// Base Plate 
 
 module Base ( ) {
     Controller_Center = [ 0,10 ];
