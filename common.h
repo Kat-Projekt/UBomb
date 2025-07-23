@@ -2,10 +2,9 @@
 #define DataPin -1
 #define MAX_TIME 300000 // 5 minuti in ms
 #define PENALTY_TIME 50000 //ms
-#define STRIKES 3
+#define MAX_STRIKES 3
 #define TOTAL_MODULES 9
-long StartTime;
-long PenaltyTime;
+long StartTime long, PenaltyTime
 
 struct BoardState
 {
@@ -17,7 +16,7 @@ struct BoardState
 		// for the DVI-D port as per manual is number 1 so first bit
 };
 
-unsigned int timeleft ( ) // the number is clamped to [0,maxtime) if 0 it is over
+long timeleft (long StartTime, long PenaltyTime) // the number is clamped to [0,maxtime) if 0 it is over
 {
 	long TimePassed = mills() - StartTime + PenaltyTime;
 	long TimeLeft = MAX_TIME - TimePassed;
