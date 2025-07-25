@@ -78,8 +78,6 @@ module Wires ( ) {
     }
 }
 
-
-
 module Button ( )
 {
     translate ( [0,0, module_d/2 - module_internal_wall] )
@@ -96,16 +94,62 @@ module Button ( )
 
 module Display ( )
 {
-    Dis_w = 32;
-    Dis_l = 16;
+    Dis_w = 30.6;
+    Dis_l = 14.6;
     
     cube ( [Dis_w,Dis_l,Max], center = true );
     
 }
 
+module Single_Display ( )
+{
+    difference ( )
+    {
+        cube ( [ 13,17.5,Max ], center = true );
+    
+        // fins
+        for ( i = [-1,1] )
+        {
+            translate ( [ 6.5*i,0, - Max/2 + module_d/2 - 1 ] )
+            cube ( [ 1,1.5, Max ], center = true );
+        }
+        
+    }
+}
+
+module Square_Led ( )
+{
+    cube ( [2.3,5.3,Max], center = true );
+    
+    translate ( [0,0,-Max/2 + module_d/2])
+    cube ( [3,5.4, Max], center = true );
+}
+
 module Memory ( ) {
+    Button_padding = 12;
+    Led_padding = 7;
+
     difference ( ) {
         BModule ( );
+        // 5 leds 
+        for ( i = [-2:2] )
+        {
+            translate ( [25, Led_padding * i - 7])
+            rotate ( 90 )
+            Square_Led ( );
+        }
+        
+        // 1 display
+        translate ( [-6, 6] )
+        Single_Display ( );
+        
+        // 4 buttons
+        translate ( [-6,-19] )
+        for ( i = [ -1.5:1.5] )
+        {
+            translate ( [ Button_padding * i,0 ])
+            Button ( );
+        }
         
     }
 }
@@ -155,8 +199,6 @@ module MorseCode ( ) {
         Led ( );
     }
 }
-
-MorseCode ( );
 
 module Password ( ) {
     Dis_w = 30;
@@ -399,3 +441,241 @@ module Base ( ) {
     }
 }
 // Base ( );
+
+module Clean_Body ( )
+{
+    union ( )
+    {
+        // corpo centrale
+        linear_extrude ( module_d, center = true )
+        square ( module_l, center = true );
+            
+        // indents laterali
+        for ( i = [ 1:4 ] ) 
+        {
+            rotate ( 90*i, [0,0,1])
+            translate ( [0,module_l/2])
+            rotate ( -90,[1,0,0] )
+            linear_extrude ( module_indent_d, scale = [(module_indent_w)/(module_indent_d+module_indent_w),1] )
+            square ( [ module_indent_w + module_indent_d, module_d], center = true );
+        }
+    }
+}
+
+module Buzzer ( )
+{
+    for ( j = [6,4,0] )
+    for ( i = [ 0:j ] )
+    {
+        translate ( [cos ( 360 / j * i ), sin ( 360/j * i ) ] * j  )
+        cylinder ( d=1, h= Max );
+    }
+}
+
+module Center_Piece ( )
+{
+    difference ( )
+    {
+        minkowski ( )
+        {
+            Clean_Body ( );
+            IcoSphere ( );
+        }
+        
+        // internal
+        translate ( [0,0,-module_internal_wall/2 - rounding/2 ] )
+        linear_extrude ( module_d - module_indent_d + rounding, center = true )
+        offset ( -module_internal_wall, $fn = 12 )
+        projection(cut = true) Clean_Body ( );
+     
+        // remove bottom to make it flat 
+        translate ( [0,0,-module_l-module_d/2+module_screw_cap_d])
+        cube ( module_l*2,center = true );
+        
+        // Display
+        Display ( );
+        
+        // 2 Led
+        translate ( [0,20] )
+        for ( i = [-1,1] )
+        {
+            translate ( [ 5 *i,0 ])
+            Led ( );
+        }
+        
+        // Buzzer
+        translate ( [22,20] )
+        Buzzer ( );
+    }
+}
+
+module Base_Plate ( )
+{
+    difference ( )
+    {
+        union ( ) {
+            // assi
+            rotate ( -90 )
+            mirror ( [1,0,0])
+            translate ( [larghezza_modulo+rounding/2 + tollerance /2,0] )
+            difference ( )
+            {
+                Separator ( 2,1 );
+                translate ( [1.75,0] )
+                Separator_Lateral_Holes ( 1 );
+            }
+            rotate ( -90 )
+            mirror ( [1,0,0])
+            translate ( [larghezza_modulo*2+body_separator_hole - tollerance /2,0] )
+            difference ( )
+            {
+                Separator ( 2,1 );
+                translate ( [1.75,0] )
+                Separator_Lateral_Holes ( 1 );
+            }
+          
+            // laterali top bot
+            
+            rotate ( -90 )
+            mirror ( [1,0,0])
+            translate ( [-body_separator_w/2-rounding/2 - tollerance,0] )
+            difference ( ) {
+                Separator ( 2,1 );
+                translate ( [-larghezza_modulo * 4 + body_separator_w/2-rounding/2-tollerance,-body_separator_w,-rounding] )
+                cube ( larghezza_modulo * 4 );
+                
+                translate ( [ 3, 0 ])
+                Separator_Holes ( 2,1);
+            }
+            
+            rotate ( -90 )
+            mirror ( [1,0,0])
+            translate ( [larghezza_modulo*3+body_separator_hole*2-rounding/2-tollerance*3/2,0] )
+            difference ( ) {
+                Separator ( 2,1 );
+                translate ( [body_separator_w/2+tollerance,-body_separator_w,-rounding] )
+                cube ( larghezza_modulo * 4 );
+                
+                translate ([1,0,0])
+                mirror ( [1,0,0])
+                Separator_Holes ( 2,1 );
+            }
+            
+            
+            // base Plate
+            Base_W = ( larghezza_modulo ) * 2 + body_separator_hole * ( 2 - 1 ) + rounding+ tollerance*2;
+            Base_H = ( larghezza_modulo ) * 3 + body_separator_hole * ( 3 - 1 ) + rounding *2 + tollerance;
+            translate ( [-rounding/2-tollerance-1.5,-rounding - tollerance * 2,-4] )
+            cube ( [ Base_W + 3, Base_H ,4 ] );
+        }
+    
+        // holes
+        lll = ( larghezza_modulo ) * 2 + body_separator_hole * ( 2 - 1 ) + rounding+ tollerance*2;
+        
+        for ( i = [0:2] )
+        {   
+            
+            translate ( [0,lll / 2 * ( 0.5 + i )] )
+            translate ( [lll,0] / 2 )
+            union ( )
+            {
+                // cable holes
+                translate ( [-50,0] )
+                cylinder ( d = 40, h = 10000, center = true );
+                translate ( [50,0] )
+                cylinder ( d = 40, h = 10000, center = true );
+                
+                cube ( [100,40,1000], center = true );
+                
+                // screws
+                translate ( [-lll/2 - 0.75,0,-2])
+                Screw ( );
+                translate ( [lll/2 - 1.4,0,-2])
+                Screw ( );
+            
+            }
+        }
+        ll = ( larghezza_modulo ) * 2 + body_separator_hole * ( 2 - 1 );
+        // base holes
+        for ( i = [-1,1] )
+        {
+            translate ( [ll/2 + i * ll / 4 ,0])
+            union ( )
+            {
+                mirror ( [0,0,1])
+                translate ( [0,-0.5])
+                cylinder ( d = 2, h = Max, $fn = 8 );
+                
+                translate ( [0,( larghezza_modulo ) * 3 + body_separator_hole * ( 3 - 1 ) + rounding+ tollerance*2-2.4])
+                mirror ( [0,0,1])
+                cylinder ( d = 2, h = Max, $fn = 8 );
+            }
+        
+        }
+    }
+}
+
+module Lateral_Plate ( )
+{
+    difference ( )
+    {
+        union ( )
+        {
+            // assi
+            // Separator ( 3,0 );
+            
+
+            translate ( [larghezza_modulo+body_separator_w + (-larghezza_modulo-rounding/2- tollerance /2)*-1,0] )
+            difference ( ) {
+                Separator ( 3,0 );
+                translate ( [body_separator_w/2+tollerance,-body_separator_w,-rounding] )
+                cube ( larghezza_modulo * 4 );
+                
+                translate ([0.5,0,0])
+                mirror ( [1,0,0])
+                Separator_Holes ( 3,0 );
+            }
+                       
+            translate ( [-larghezza_modulo-body_separator_w + (-larghezza_modulo-rounding/2- tollerance /2)*-1,0] )
+            difference ( ) {
+                Separator ( 3,0 );
+                translate ( [-larghezza_modulo * 4 + body_separator_w/2-rounding/2-tollerance,-body_separator_w,-rounding] )
+                cube ( larghezza_modulo * 4 );
+                
+                translate ( [ 3, 0 ])
+                Separator_Holes ( 3,0 );
+                
+            } 
+        }
+    
+        // holes
+        lll = ( larghezza_modulo ) * 2 + body_separator_hole * ( 2 - 1 ) + rounding+ tollerance*2;
+        
+        for ( i = [0:2] )
+        {   
+            
+            translate ( [0,lll / 2 * ( 0.5 + i )] )
+            translate ( [lll,0] / 2 )
+            union ( )
+            {
+                // cable holes
+                translate ( [-50,0] )
+                cylinder ( d = 40, h = 10000, center = true );
+                translate ( [50,0] )
+                cylinder ( d = 40, h = 10000, center = true );
+                
+                cube ( [100,40,1000], center = true );
+                
+                // screws
+                translate ( [-lll/2 - 0.75,0,-2])
+                Screw ( );
+                translate ( [lll/2 - 1.4,0,-2])
+                Screw ( );
+            
+            }
+        }
+        
+    }
+}
+
+Lateral_Plate ( );

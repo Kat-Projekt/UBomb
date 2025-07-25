@@ -318,7 +318,7 @@ module CModule ( ) // bottom lid or cap
 
 // ------------- CONTAINER ------------
 
-module Separator_Holes ( segments, vertical_cut = 1) 
+module Separator_Holes ( segments, vertical_cut = 1 ) 
 {
     // screw holes 
         
@@ -335,6 +335,14 @@ module Separator_Holes ( segments, vertical_cut = 1)
         }
     }
 }
+
+module Separator_Lateral_Holes ( vertical_cut = 1 )
+{
+    translate ( [0,0, vertical_cut * body_separator_d / 2 + body_separator_d / 4] )
+    rotate ( 90, [1,0,0] )
+    cylinder ( d = 2, h = 100000, center = true, $fn = 16 );
+}
+
 module Separator ( segments, vertical_cut = 1 )
 {
     lungezza = ( larghezza_modulo ) * segments + body_separator_hole * ( segments - 1 );
@@ -357,7 +365,7 @@ module Separator ( segments, vertical_cut = 1 )
                 ] )
                 union ( )
                 {   
-                    translate ( [0,-larghezza_modulo+clip_pading+normal_clip_w] )
+                    translate ( [0,-larghezza_modulo+clip_pading+normal_clip_w-0.5] )
                     {
                         translate ( [body_separator_w,0] )
                         Clip ( normal_clip_w );
@@ -367,7 +375,7 @@ module Separator ( segments, vertical_cut = 1 )
                         Clip ( normal_clip_w );
                     }
                     
-                    translate ( [0,-clip_pading] )
+                    translate ( [0,-clip_pading+1.5] )
                     {
                         translate ( [body_separator_w,0] )
                         Clip ( normal_clip_w );
@@ -450,13 +458,25 @@ translate ( [-tollerance/2,rounding/2+tollerance/2
 union ( ) {
     BModule ( );
     CModule ( );
-} 
+}
 
-difference ( ) {
+translate ( [-1,3,0] * (module_l/2+module_indent_d+rounding/2 + tollerance) )
+translate ( [0,5,0] )
+translate ( [-tollerance/2,rounding/2+tollerance/2
+
+,module_d/2+rounding/sqrt(3)] )
+union ( ) {
+    BModule ( );
+    CModule ( );
+}
+
+/*
+
 translate ( [ rounding/2,0])
 union ( ) {
     // assi
-    Separator ( 3,0 );
+    // Separator ( 3,0 );
+    
     rotate ( -90 )
     mirror ( [1,0,0])
     translate ( [larghezza_modulo+rounding/2 + tollerance /2,-larghezza_modulo-rounding/2 - tollerance /2,0] )
@@ -466,6 +486,7 @@ union ( ) {
     translate ( [larghezza_modulo*2+body_separator_hole - tollerance /2,-larghezza_modulo-rounding/2- tollerance /2,0] )
     Separator ( 2,1 );
     
+    /*
     // laterali left right
     translate ( [larghezza_modulo+body_separator_w,0] )
     difference ( ) {
@@ -479,7 +500,7 @@ union ( ) {
         Separator ( 3,0 );
         translate ( [-larghezza_modulo * 4 + body_separator_w/2-rounding/2-tollerance,-body_separator_w,-rounding] )
         cube ( larghezza_modulo * 4 );
-    }
+    } 
     
     // laterali top bot
     
@@ -490,6 +511,9 @@ union ( ) {
         Separator ( 2,1 );
         translate ( [-larghezza_modulo * 4 + body_separator_w/2-rounding/2-tollerance,-body_separator_w,-rounding] )
         cube ( larghezza_modulo * 4 );
+        
+        translate ( [ 3, 0 ])
+        Separator_Holes ( 2,1);
     }
     
     rotate ( -90 )
@@ -499,11 +523,13 @@ union ( ) {
         Separator ( 2,1 );
         translate ( [body_separator_w/2+tollerance,-body_separator_w,-rounding] )
         cube ( larghezza_modulo * 4 );
+        
+        translate ([1,0,0])
+        mirror ( [1,0,0])
+        Separator_Holes ( 2,1);
     }
 }
 
-
-}
 
 
 // CModule ( );
