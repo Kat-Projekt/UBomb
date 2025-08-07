@@ -1,198 +1,74 @@
 #include "../common.h"
-#define led_sol_1 ;//12 pin digitali
-#define led_sol_2 ;//12 pin digitali
-#define led_sol_3 ;//12 pin digitali
-#define led_sol_4 ;//12 pin digitali
-#define led_sol_5 ;//12 pin digitali
-#define led_sol_6 ;//12 pin digitali
-#define led_sol_7 ;//12 pin digitali
-#define led_sol_8 ;//12 pin digitali
-#define led_sol_9 ;//12 pin digitali
-#define led_sol_10 ;//12 pin digitali
-#define led_sol_11 ;//12 pin digitali
-#define led_sol_12 ;//12 pin digitali
-#define led_time_1 ;//3 pin anal
-#define led_time_2 ;//3 pin anal
-#define led_time_3 ;//3 pin anal
-#define potentiometer ;//potenziometro
-#define led_solved ; //led out
-#define randomness_pin ; // a disconnected analog pin;
+#define MaxTime 60 * 1000
 
-bool is_up (){
-
+char puzzleMask [8] [12] = {
+	"ooxoxxxxxxox",
+	"xoxoxooxxoxx",
+	"oxxooxxxxxox",
+	"xoxoxooxooox",
+	"ooooxoxooxxx",
+	"ooooxooooxxo",
+	"xoxxxxxxxoxo",
+	"xoxxooxxxoxo"
 }
 
-bool is_right (){
-	
+Potenziometer Pot ( A2 ); // analog 1
+Led Solved ( 12 ); // for indicating correct positioning
+Led Timer [3] = { Led(A3), Led(A4), Led(A5) };
+Led Comb [12];
+
+void tellTime ( )
+{
+	// 0-33 Led1
+	// 34-66 Led2
+	// 67-100 Led3
+	float T = float ( millis ( ) % MaxTime ) / MaxTime;
+	Timer [0].Dim (
+		t > 0.33 ? 1 : t * 3 	
+	);
+	Timer [1].Dim (
+		t < 0.33 ? 0 : 
+		( t < 0.66 ? ( t - 0.33 ) * 3 : 1 )
+	);
+	Timer [2].Dim (
+		t < 0.66 ? 0 : ( t - 0.66 ) * 3 	
+	);
 }
 
-bool is_down (){
-	
-}
-
-bool is_left (){
-	
-}
-
-void set_solution(int num){
-	switch (num) {
-		case 0:
-			digitalwrite(led_sol_1, LOW);
-			digitalwrite(led_sol_2, LOW);
-			digitalwrite(led_sol_3, HIGH);
-			digitalwrite(led_sol_4, LOW);
-			digitalwrite(led_sol_5, HIGH);
-			digitalwrite(led_sol_6, HIGH);
-			digitalwrite(led_sol_7, HIGH);
-			digitalwrite(led_sol_8, HIGH);
-			digitalwrite(led_sol_9, HIGH);
-			digitalwrite(led_sol_10, HIGH);
-			digitalwrite(led_sol_11, LOW);
-			digitalwrite(led_sol_12, HIGH);
-			break;
-		case 1:
-			digitalwrite(led_sol_1, HIGH);
-			digitalwrite(led_sol_2, LOW);
-			digitalwrite(led_sol_3, HIGH);
-			digitalwrite(led_sol_4, LOW);
-			digitalwrite(led_sol_5, HIGH);
-			digitalwrite(led_sol_6, LOW);
-			digitalwrite(led_sol_7, LOW);
-			digitalwrite(led_sol_8, HIGH);
-			digitalwrite(led_sol_9, HIGH);
-			digitalwrite(led_sol_10, LOW);
-			digitalwrite(led_sol_11, HIGH);
-			digitalwrite(led_sol_12, HIGH);
-			break;
-		case 2:
-			digitalwrite(led_sol_1, LOW);
-			digitalwrite(led_sol_2, HIGH);
-			digitalwrite(led_sol_3, HIGH);
-			digitalwrite(led_sol_4, LOW);
-			digitalwrite(led_sol_5, LOW);
-			digitalwrite(led_sol_6, HIGH);
-			digitalwrite(led_sol_7, HIGH);
-			digitalwrite(led_sol_8, HIGH);
-			digitalwrite(led_sol_9, HIGH);
-			digitalwrite(led_sol_10, HIGH);
-			digitalwrite(led_sol_11, LOW);
-			digitalwrite(led_sol_12, HIGH);
-			break;
-		case 3:
-			digitalwrite(led_sol_1, HIGH);
-			digitalwrite(led_sol_2, LOW);
-			digitalwrite(led_sol_3, HIGH);
-			digitalwrite(led_sol_4, LOW);
-			digitalwrite(led_sol_5, HIGH);
-			digitalwrite(led_sol_6, LOW);
-			digitalwrite(led_sol_7, LOW);
-			digitalwrite(led_sol_8, HIGH);
-			digitalwrite(led_sol_9, LOW);
-			digitalwrite(led_sol_10, LOW);
-			digitalwrite(led_sol_11, LOW);
-			digitalwrite(led_sol_12, HIGH);
-			break;
-		case 4:
-			digitalwrite(led_sol_1, LOW);
-			digitalwrite(led_sol_2, LOW);
-			digitalwrite(led_sol_3, LOW);
-			digitalwrite(led_sol_4, LOW);
-			digitalwrite(led_sol_5, HIGH);
-			digitalwrite(led_sol_6, LOW);
-			digitalwrite(led_sol_7, HIGH);
-			digitalwrite(led_sol_8, LOW);
-			digitalwrite(led_sol_9, LOW);
-			digitalwrite(led_sol_10, HIGH);
-			digitalwrite(led_sol_11, HIGH);
-			digitalwrite(led_sol_12, HIGH);
-			break;
-		case 5:
-			digitalwrite(led_sol_1, LOW);
-			digitalwrite(led_sol_2, LOW);
-			digitalwrite(led_sol_3, LOW);
-			digitalwrite(led_sol_4, LOW);
-			digitalwrite(led_sol_5, HIGH);
-			digitalwrite(led_sol_6, LOW);
-			digitalwrite(led_sol_7, LOW);
-			digitalwrite(led_sol_8, LOW);
-			digitalwrite(led_sol_9, LOW);
-			digitalwrite(led_sol_10, HIGH);
-			digitalwrite(led_sol_11, HIGH);
-			digitalwrite(led_sol_12, LOW);
-			break;
-		case 6:
-			digitalwrite(led_sol_1, HIGH);
-			digitalwrite(led_sol_2, LOW);
-			digitalwrite(led_sol_3, HIGH);
-			digitalwrite(led_sol_4, HIGH);
-			digitalwrite(led_sol_5, HIGH);
-			digitalwrite(led_sol_6, HIGH);
-			digitalwrite(led_sol_7, HIGH);
-			digitalwrite(led_sol_8, HIGH);
-			digitalwrite(led_sol_9, HIGH);
-			digitalwrite(led_sol_10, LOW);
-			digitalwrite(led_sol_11, HIGH);
-			digitalwrite(led_sol_12, LOW);
-			break;
-		case 7:
-			digitalwrite(led_sol_1, HIGH);
-			digitalwrite(led_sol_2, LOW);
-			digitalwrite(led_sol_3, HIGH);
-			digitalwrite(led_sol_4, HIGH);
-			digitalwrite(led_sol_5, LOW);
-			digitalwrite(led_sol_6, LOW);
-			digitalwrite(led_sol_7, HIGH);
-			digitalwrite(led_sol_8, HIGH);
-			digitalwrite(led_sol_9, HIGH);
-			digitalwrite(led_sol_10, LOW);
-			digitalwrite(led_sol_11, HIGH);
-			digitalwrite(led_sol_12, LOW);	
-			break;
-		default:
-			// statements
-			break;
-    }
+void setPuzzle ( int p )
+{
+	for ( int i = 0; i < 12; i++ )
+	{
+		if ( puzzleMask[p][i] == 'o' )
+		{
+			Comb[i].Dark ( );
+		}
+		else
+		{
+			Comb[i].Light ( );
+		}
+	}
 }
 
 void setup ( )
 {
-	auto State = get ( );
+	for ( int i = 0; i < 12; i++ )
+	{
+		Comb[i] = Led ( i );
+		Comb[i].Start ( );
+	}
+	for ( int i = 0; i < 3; i++ )
+	{
+		Timer[i].Start ( );
+	}
 
-	pinmode(led_sol_1, OUTPUT);
-	pinmode(led_sol_2, OUTPUT);
-	pinmode(led_sol_3, OUTPUT);
-	pinmode(led_sol_4, OUTPUT);
-	pinmode(led_sol_5, OUTPUT);
-	pinmode(led_sol_6, OUTPUT);
-	pinmode(led_sol_7, OUTPUT);
-	pinmode(led_sol_8, OUTPUT);
-	pinmode(led_sol_9, OUTPUT);
-	pinmode(led_sol_10, OUTPUT);
-	pinmode(led_sol_11, OUTPUT);
-	pinmode(led_sol_12, OUTPUT);
-	pinmode(led_time_1, OUTPUT);
-	pinmode(led_time_2, OUTPUT);
-	pinmode(led_time_3, OUTPUT);
-	pinmode(led_solved, OUTPUT);
-	pinmode(potentiometer, INPUT);
-	pinmode(randomness_pin, INPUT);
-	// set up local variables that use the State
-
-	//initialize random number gen;
-	randomSeed(analogRead(randomness_pin));
-
-	timeleft ( ); // inizialize timer for the modues that use it
-
-	int solution = random(8);
-
-	set_solution(solution);
-
+	Solved.Start ( );
+	Pot.Start ( );
 }
 
 void loop ( )
 {
-	// do the module things
-	if(){
+	if ( ) {
 		solution = random(8);
 		set_solution(soluion);
 	}

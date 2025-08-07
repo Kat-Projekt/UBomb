@@ -179,6 +179,43 @@ module Selettore ( ) {
     }
 }
 
+module Cap ( ) {
+    
+    difference ( )
+    {
+        union ( ) {
+            cylinder ( d = 20, h = 36 );
+        }
+    
+        difference ( )
+        {
+            difference ( )
+            {
+                union ( )
+                {
+                    translate ( [0,0,8] )
+                    cylinder ( d = 6, h = 26, $fn = 32 );
+                    cylinder ( d = 9.5, h = 8, $fn = 32 );
+                }
+                
+                translate ( [ 1.7,-250,8] )
+                cube ( 500 );
+            }
+        }
+        
+        segmenti = 10;
+        for ( i = [ 0 : segmenti ] )
+        {
+            rotate ( 360 / segmenti * i )
+            translate ( [9,0, 4] )
+            cube ( [2,2,Max] );
+        }
+    }
+}
+
+Cap ();
+
+
 module MorseCode ( ) {
     Dis_w = 32;
     Dis_l = 16;
@@ -678,4 +715,4 @@ module Lateral_Plate ( )
     }
 }
 
-Lateral_Plate ( );
+// Lateral_Plate ( );
