@@ -1,19 +1,41 @@
 #include "../common.h"
+Solution_Led Solved ( 12 );
+Wire Wires [ 6 ];
+
+#define first_wire 3
+#define correct 3
 
 void setup ( )
 {
 	auto State = get ( );
-	// set up local variables that use the State
-	timeleft ( ); // inizialize timer for the modues that use it
+	for ( int i = 0; i < 6; i ++ )
+	{
+		Wires [i] = Wire ( first_wire+i );
+		Wires [i].Start ( );
+	}
+
+	Solved.Start ( );
 }
 
 void loop ( )
 {
-	// do the module things
+	if ( ! Solved.not ( ) )
+	{ 
+		return;
+	}
 
-	// check fo 1 1
-	if ( is_end ( ) )
+	for ( int i = 0; i < 6; i ++ )
 	{
-		// do something?
+		if ( Wires [i].Check ( ) )
+		{
+			if ( i == correct )
+			{
+				Solved.Solved ( );
+			}
+			else
+			{
+				Solved.Failed ( );
+			}
+		}
 	}
 }
