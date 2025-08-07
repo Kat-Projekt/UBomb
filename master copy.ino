@@ -1,18 +1,14 @@
 #include "common.h"
 #include <TM1637.h> //https://youtu.be/6W7tycX-F1o
-#define CLK -1;
-#define DIO -1;
-#define BRHT 2; //value 0-7 brightness timer
+#define CLK 2
+#define DIO 4
+#define BRHT 2 //value 0-7 brightness timer
 TM1637 tm(CLK,DIO);
-
-
-
 
 int Modules_Solved = 0;
 int Strikes = 0;
 
-long StartTime = 0;
-long PenaltyTime = 0;
+class B { };
 
 BoardState get ( )
 {
@@ -22,17 +18,16 @@ BoardState get ( )
 
 void display_time ( long time )
 {
-	time = time / 1000;
-	int sec = time % 60;
-	int min = time / 60;
+	long sec = time / 1000;
+	long min = sec / 60;
+	sec %= 60;
 
 	tm.display(0,min/10); 
 	tm.display(1,min%10);
-	tm.display(1); //activate : in the clock
+	tm.point(1); //activate : in the clock
+	delay (100);
 	tm.display(2,sec/10);
 	tm.display(3,sec%10);
-
-	// do the time display here
 }
 
 void detonate ( )
@@ -55,8 +50,6 @@ void correct ( )
 void error ( )
 {
 	Strikes ++;
-	PenaltyTime += PENALTY_TIME;
-	
 }
 
 
@@ -73,14 +66,12 @@ void check_wires ( )
 
 void setup ( )
 {
-	pinMode(ClockPin, OUTPUT);
-	pinMode(DataPin, OUTPUT);
+	pinMode(CLK, OUTPUT);
+	pinMode(DIO, OUTPUT);
 	
 	auto State = get ( );
 	// trasmit over the ClockPin e DataPin following I2C standard
-	wire.begin();
-	
-	wire.end();
+
 	// the Board State
 	
 	// set up for the timing function and display
@@ -91,7 +82,6 @@ void setup ( )
 	tm.set(BRHT);
 
 	//wait for signal to start
-	StartTime = mill();
 }
 
 void loop ( ) 
@@ -108,10 +98,9 @@ void loop ( )
 	// update Tries accordingly
 	// decrement Modules Solved accordingly
 
-
 	check_wires();
 
-	if ( timeleft() == 0 || Strikes >= MAX_STRIKES )
+	if ( timeleft ( ) == 0 || Strikes >= MAX_STRIKES )
 	{
 		// send the End the Game state
 		detonate();
@@ -126,5 +115,5 @@ void loop ( )
 	}
 
 	// displays time left
-	display_time ( timeleft (StartTime, PenaltyTime) ); 
+	display_time ( timeleft ( ) ); 
 }
